@@ -16,9 +16,10 @@ export const ListItem = ({ id, name, number }) => {
         <Button
           type="button"
           disabled={isLoading}
-          onClick={() => (
-            deleteContact(id), toast.success(`${name} is deleted`)
-          )}
+          onClick={() => {
+            toast.success(`${name} is deleted`);
+            deleteContact(id);
+          }}
         >
           Delete
         </Button>
