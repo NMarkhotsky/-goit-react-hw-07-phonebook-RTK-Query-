@@ -22,7 +22,7 @@ export const ContactForm = () => {
         );
         return duplicateName
           ? toast(`${values.name} is already in contacts.`, { icon: '⚠️' })
-          : (toast(`${values.name} added to contacts.`, { icon: '✅' }),
+          : (toast.success(`${values.name} added to contacts.`),
             addContact(values),
             action.resetForm());
       }}

@@ -1,6 +1,7 @@
 import { useDeleteContactMutation } from 'redux/contactsSlice';
 import { Button, Item, Thumb } from './ContactItem.styled';
 import PropTypes from 'prop-types';
+import { toast } from 'react-hot-toast';
 
 export const ListItem = ({ id, name, number }) => {
   const [deleteContact, { isLoading }] = useDeleteContactMutation();
@@ -15,7 +16,9 @@ export const ListItem = ({ id, name, number }) => {
         <Button
           type="button"
           disabled={isLoading}
-          onClick={() => deleteContact(id)}
+          onClick={() => (
+            deleteContact(id), toast.success(`${name} is deleted`)
+          )}
         >
           Delete
         </Button>
