@@ -1,27 +1,30 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from 'redux/operations';
-import { selectContacts } from 'redux/selector';
 import { Formik, Field, ErrorMessage } from 'formik';
 import { Form, Label, Button } from './ContactForm.styled';
 import { ContactSchema, phoneNumberMask } from 'components/Utils/Validate';
 import MaskedInput from 'react-text-mask';
 import toast from 'react-hot-toast';
+import {
+  useAddContactsMutation,
+  useGetContactsQuery,
+} from 'redux/contactsSlice';
 
 export const ContactForm = () => {
-  const contact = useSelector(selectContacts);
-  const dispatch = useDispatch();
+  const { data } = useGetContactsQuery();
+  const [addContact] = useAddContactsMutation();
 
   return (
     <Formik
       initialValues={{ name: '', number: '' }}
       validationSchema={ContactSchema}
       onSubmit={(values, action) => {
-        const duplicateName = contact.find(
+        const duplicateName = data.find(
           ({ name }) => name.toLowerCase() === values.name.toLowerCase()
         );
         return duplicateName
           ? toast(`${values.name} is already in contacts.`, { icon: '⚠️' })
-          : (dispatch(addContact(values)), action.resetForm());
+          : (toast(`${values.name} added to contacts.`, { icon: '✅' }),
+            addContact(values),
+            action.resetForm());
       }}
     >
       <Form>

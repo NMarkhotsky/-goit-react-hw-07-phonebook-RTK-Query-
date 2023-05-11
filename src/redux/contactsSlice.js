@@ -1,38 +1,36 @@
-import { createSlice, isAnyOf } from '@reduxjs/toolkit';
-import { fetchContacts, addContact, deleteContact } from './operations';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const extraActions = [fetchContacts, addContact, deleteContact];
-const getActions = type => isAnyOf(...extraActions.map(action => action[type]));
-
-const handlePending = state => {
-  state.isLoading = true;
-};
-
-const handleRejected = (state, action) => {
-  state.isLoading = false;
-  state.error = action.payload;
-};
-
-const contactsSlice = createSlice({
-  name: 'contacts',
-  initialState: { items: [], isLoading: false, error: null },
-  extraReducers: builder =>
-    builder
-      .addCase(fetchContacts.fulfilled, (state, { payload }) => {
-        state.items = payload;
-      })
-      .addCase(addContact.fulfilled, (state, { payload }) => {
-        state.items.push(payload);
-      })
-      .addCase(deleteContact.fulfilled, (state, { payload }) => {
-        state.items = state.items.filter(contact => contact.id !== payload.id);
-      })
-      .addMatcher(getActions('pending'), handlePending)
-      .addMatcher(getActions('rejected'), handleRejected)
-      .addMatcher(getActions('fulfilled'), state => {
-        state.isLoading = false;
-        state.error = null;
+export const contactsSlice = createApi({
+  reducerPath: 'contacts',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://6453ab91c18adbbdfea42414.mockapi.io',
+  }),
+  tagTypes: ['Contacts'],
+  endpoints: build => ({
+    getContacts: build.query({
+      query: () => `/contacts`,
+      providesTags: ['Contacts'],
+    }),
+    addContacts: build.mutation({
+      query: contact => ({
+        url: '/contacts',
+        method: 'POST',
+        body: contact,
       }),
+      invalidatesTags: ['Contacts'],
+    }),
+    deleteContact: build.mutation({
+      query: id => ({
+        url: `/contacts/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Contacts'],
+    }),
+  }),
 });
 
-export const contactsReducer = contactsSlice.reducer;
+export const {
+  useGetContactsQuery,
+  useAddContactsMutation,
+  useDeleteContactMutation,
+} = contactsSlice;
